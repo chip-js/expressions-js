@@ -1,0 +1,28 @@
+{
+  "name": "expressions-js",
+  "version": "0.1.0",
+  "description": "Converts simplified JavaScript expressions into executable functions for JavaScript frameworks.",
+  "keywords": [
+    "templates",
+    "data-binding",
+    "javascript",
+    "expressions"
+  ],
+  "homepage": "http://github.com/chip-js/expressions-js",
+  "author": {
+    "name": "Jacob Wright",
+    "email": "jacwright@gmail.com",
+    "url": "http://github.com/jacwright"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chip-js/expressions-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chip-js/expressions-js/issues"
+  },
+  "licenses": {
+    "type": "MIT",
+    "url": "git://github.com/chip-js/expressions-js/LICENSE"
+  }
+}
