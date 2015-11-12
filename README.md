@@ -92,7 +92,7 @@ expressions.globals._ = require('underscore');
 
 **Note:** "globals" do not need to be on the global scope of the browser window. They are simply globally available
 within expressions. You can also use window globals by prefixing with `window` like: `window._.pluck()`. But using the
-globals option is nicer than doing this.
+globals option is nicer than doing this. If you use `null` as the value of a global it will use the window's version.
 
 
 ### Formatters
@@ -234,7 +234,7 @@ creates
 ```
 function() {
   var _ref1;
-  return (_ref1 = this.user) != null ? _ref1.name : undefined;
+  return (_ref1 = this.user) == null ? void 0 : _ref1.name;
 }
 ```
 ```
@@ -244,7 +244,7 @@ creates
 ```
 function(value) {
   var _ref1;
-  (_ref1 = this.user) != null ? (_ref1.name = value) : undefined;
+  (_ref1 = this.user) == null ? void 0 : (_ref1.name = value);
 }
 ```
 
@@ -252,6 +252,9 @@ This null-checking is added to all property chains within the expression. This i
 it. And it is ideal for the way we want expressions to work in templating systems and data-binding frameworks. It safely
 binds to the given context, dealing gracefully with `undefined` or `null` values, while still allowing for errors to be
 thrown from the user's code helping them find bugs easily.
+
+Moving on to how globals and formatters work is much simpler. They are added to the arguments of the function and
+referenced within the function from their object.
 
 ```
 var globals = { moment: require('moment') };
@@ -261,7 +264,7 @@ creates
 ```
 function(_globals_) {
   var _ref1, _ref2;
-  return _globals_.moment != null ? (_ref2 = _globals_.moment((_ref1 = this.friend) != null ? _ref1.birthday : undefined)) != null ? _ref2.format() : undefined : undefined;
+  return _globals_.moment == null ? void 0 : (_ref2 = _globals_.moment((_ref1 = this.friend) == null ? void 0: _ref1.birthday)) == null ? void 0 : _ref2.format();
 }
 ```
 
@@ -275,9 +278,14 @@ creates
 ```
 function(_formatters_) {
   var _ref1;
-  return _formatters_.filter((_ref1 = this.user) != null ? _ref1.name : undefined, this.isAdmin);
+  return _formatters_.filter.call(this, (_ref1 = this.user) == null ? void 0 : _ref1.name, this.isAdmin);
 }
 ```
+
+**Note:** because `globals` uses the properties defined on the `globals` object to write the function, any properties
+added to `globals` after an expression is parsed into a function will not be evaluated correctly. The parser will not
+know at the time of parsing that, for example, `moment` was to be called off of `_globals_` rather than `this`. Be sure
+to have all globals needed for an expression at the time it is compiled.
 
 
 ## Contributions and Issues
