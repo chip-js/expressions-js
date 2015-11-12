@@ -24,5 +24,12 @@
   "licenses": {
     "type": "MIT",
     "url": "git://github.com/chip-js/expressions-js/LICENSE"
+  },
+  "scripts": {
+    "test": "mocha test"
+  },
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "mocha": "^2.3.3"
   }
 }
