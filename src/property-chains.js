@@ -67,8 +67,16 @@ exports.parseExpression = function(expr, _globals) {
   globals = _globals;
 
   expr = replaceAndsAndOrs(expr);
-  expr = parsePropertyChains(expr);
-  expr = expr.replace(') = _value_', ' = _value_)');
+  if (expr.indexOf(' = ') !== -1) {
+    var parts = expr.split(' = ');
+    var setter = parts[0];
+    var value = parts[1];
+    setter = parsePropertyChains(setter).replace(/^\(|\)$/g, '');
+    value = parsePropertyChains(value);
+    expr = setter + ' = ' + value;
+  } else {
+    expr = parsePropertyChains(expr);
+  }
   expr = addReferences(expr)
 
   // Reset after parse is done

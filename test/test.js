@@ -55,6 +55,10 @@ describe('Expressions.js', function() {
         expect(parse('name | upper')).to.equal('_formatters_.upper.call(this, name)');
       });
 
+      it('should parse a formatter in a setter', function() {
+        expect(parse('name = _value_ | upper')).to.equal('name = _formatters_.upper.call(this, _value_, true)');
+      });
+
       it('should parse multiple formatters', function() {
         var expr = 'name | upper | foo()';
         var result = '_formatters_.foo.call(this, _formatters_.upper.call(this, name))';
@@ -142,28 +146,28 @@ describe('Expressions.js', function() {
 
       it('should work with deep setters', function() {
         var expr = 'foo.bar = _value_';
-        var result = 'var _ref1;\n((_ref1 = this.foo) == null ? void 0 : _ref1.bar = _value_)';
+        var result = 'var _ref1;\n(_ref1 = this.foo) == null ? void 0 : _ref1.bar = _value_';
         expect(parse(expr)).to.equal(result);
       });
 
       it('should work with setters after brackets', function() {
         var expr = 'foo[bar] = _value_';
-        var result = 'var _ref1;\n((_ref1 = this.foo) == null ? void 0 : _ref1[this.bar] = _value_)';
+        var result = 'var _ref1;\n(_ref1 = this.foo) == null ? void 0 : _ref1[this.bar] = _value_';
         expect(parse(expr)).to.equal(result);
       });
 
       it('should work with setters after functions', function() {
         var expr = 'foo(bar.abc).test = _value_';
-        var result = 'var _ref1, _ref2;\n(typeof this.foo !== \'function\' ? void 0 : ' +
+        var result = 'var _ref1, _ref2;\ntypeof this.foo !== \'function\' ? void 0 : ' +
                      '(_ref1 = this.foo(((_ref2 = this.bar) == null ? void 0 : _ref2.abc))) == null ? ' +
-                     'void 0 : _ref1.test = _value_)';
+                     'void 0 : _ref1.test = _value_';
         expect(parse(expr)).to.equal(result);
       });
 
       it('should work with setters after functions', function() {
         var expr = 'foo(bar).test = _value_';
-        var result = 'var _ref1;\n(typeof this.foo !== \'function\' ? void 0 : ' +
-                     '(_ref1 = this.foo(this.bar)) == null ? void 0 : _ref1.test = _value_)';
+        var result = 'var _ref1;\ntypeof this.foo !== \'function\' ? void 0 : ' +
+                     '(_ref1 = this.foo(this.bar)) == null ? void 0 : _ref1.test = _value_';
         expect(parse(expr)).to.equal(result);
       });
 
@@ -243,6 +247,16 @@ describe('Expressions.js', function() {
 
       it('should not fail when a function does not exist', function() {
         expect(callFoo.bind({})).to.not.throw(Error);
+      });
+
+
+      it('should compile formatted setters correctly', function() {
+        var expr = expressions.parseSetter('user.name | upper');
+        var result = 'var _ref1, _ref2, _ref3;\n' +
+          '(_ref1 = this.user) == null ? void 0 : _ref1.name = ' +
+          '((_ref2 = _formatters_) == null ? void 0 : (_ref3 = _ref2.upper) == null ? void 0 : ' +
+          'typeof _ref3.call !== \'function\' ? void 0 : _ref3.call(this, _value_, true))';
+        expect(expr.expr).to.equal(result);
       });
     });
 
