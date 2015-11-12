@@ -8,9 +8,8 @@ var cache = {};
 exports.globals = {};
 
 
-exports.parse = function(expr, globals, formatters) {
-  var extraArgs = slice.call(arguments, 3), original = expr;
-
+exports.parse = function(expr, globals, formatters, extraArgs) {
+  if (!Array.isArray(extraArgs)) extraArgs = [];
   var cacheKey = expr + '|' + extraArgs.join(',');
   // Returns the cached function for this expression if it exists.
   var func = cache[cacheKey];
@@ -18,7 +17,8 @@ exports.parse = function(expr, globals, formatters) {
     return func;
   }
 
-  var isSetter = extraArgs[0] === valueProperty;
+  var original = expr;
+  var isSetter = (extraArgs[0] === valueProperty);
   // Allow '!prop' to become 'prop = !value'
   if (isSetter && expr.charAt(0) === '!') {
     expr = expr.slice(1);
@@ -26,7 +26,7 @@ exports.parse = function(expr, globals, formatters) {
   }
 
   expr = strings.pullOutStrings(expr);
-  expr = formatterParser.parseFormatters(expr, isSetter && valueProperty);
+  expr = formatterParser.parseFormatters(expr);
   expr = propertyChains.parseExpression(expr, getVariables(globals, extraArgs));
   if (!isSetter) {
     var lines = expr.split('\n');
@@ -35,19 +35,20 @@ exports.parse = function(expr, globals, formatters) {
   }
   expr = strings.putInStrings(expr);
   func = compileExpression(original, expr, globals, formatters, extraArgs);
+  func.expr = expr;
   cache[cacheKey] = func;
   return func;
 };
 
 
-exports.parseSetter = function(expr, globals, formatters) {
-  var args = slice.call(arguments);
-  while (args.length < 3) args.push(null);
-  args.splice(3, 0, valueProperty);
-  args[0] = args[0].replace(/(\s*\||$)/, ' = _value_$1');
+exports.parseSetter = function(expr, globals, formatters, extraArgs) {
+  if (!Array.isArray(extraArgs)) extraArgs = [];
 
   // Add _value_ as the first extra argument
-  return exports.parse.apply(null, args);
+  extraArgs.unshift(valueProperty);
+  expr = expr.replace(/(\s*\||$)/, ' = _value_$1');
+
+  return exports.parse(expr, globals, formatters, extraArgs);
 };
 
 
