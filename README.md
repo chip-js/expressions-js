@@ -8,6 +8,12 @@ supports formatters (also called filters in some frameworks) to alter the result
 
 ### Basic
 
+To install Expressions.js you can use npm.
+
+```
+npm install expressions-js
+```
+
 `parse(expr)` will return a function that can be executed against any context and will return the results.
 
 ```
