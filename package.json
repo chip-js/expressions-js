@@ -21,10 +21,7 @@
   "bugs": {
     "url": "https://github.com/chip-js/expressions-js/issues"
   },
-  "licenses": {
-    "type": "MIT",
-    "url": "git://github.com/chip-js/expressions-js/LICENSE"
-  },
+  "license": "MIT",
   "scripts": {
     "test": "mocha test"
   },
