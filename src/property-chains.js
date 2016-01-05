@@ -25,7 +25,7 @@ var defaultGlobals = {
 
 
 // matches property chains (e.g. `name`, `user.name`, and `user.fullName().capitalize()`)
-var propertyRegex = /((\{|,|\.)?\s*)([a-z$_\$](?:[a-z_\$0-9\.-]|\[['"\d]+\])*)(\s*(:|\(|\[)?)|(\[)/gi;
+var propertyRegex = /((\{|,|\.)?\s*)([a-z$_\$](?:[a-z_\$0-9\.-]|\[['"\d]+\])*)(\s*(:|\(|\[)?)/gi;
 /**
  * Broken down
  *
