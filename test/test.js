@@ -140,6 +140,14 @@ describe('Expressions.js', function() {
         expect(parse('foo[bar]')).to.equal('var _ref1;\n((_ref1 = this.foo) == null ? void 0 : _ref1[this.bar])');
       });
 
+      it('should deal with array literals', function() {
+        expect(parse('[foo, bar]')).to.equal('[this.foo, this.bar]');
+      });
+
+      it('should deal with object literals', function() {
+        expect(parse('{foo: foo, bar: bar }')).to.equal('{foo: this.foo, bar: this.bar }');
+      });
+
       it('should work with simple setters', function() {
         expect(parse('foo = _value_')).to.equal('this.foo = _value_');
       });
