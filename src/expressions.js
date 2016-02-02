@@ -19,11 +19,6 @@ exports.parse = function(expr, globals, formatters, extraArgs) {
 
   var original = expr;
   var isSetter = (extraArgs[0] === valueProperty);
-  // Allow '!prop' to become 'prop = !value'
-  if (isSetter && expr.charAt(0) === '!') {
-    expr = expr.slice(1);
-    valueProperty = '!' + valueProperty;
-  }
 
   expr = strings.pullOutStrings(expr);
   expr = formatterParser.parseFormatters(expr);
@@ -46,7 +41,12 @@ exports.parseSetter = function(expr, globals, formatters, extraArgs) {
 
   // Add _value_ as the first extra argument
   extraArgs.unshift(valueProperty);
-  expr = expr.replace(/(\s*\||$)/, ' = _value_$1');
+  if (expr.charAt(0) === '!') {
+    // Allow '!prop' to become 'prop = !value'
+    expr = expr.slice(1).replace(/(\s*\||$)/, ' = !_value_$1');
+  } else {
+    expr = expr.replace(/(\s*\||$)/, ' = _value_$1');
+  }
 
   return exports.parse(expr, globals, formatters, extraArgs);
 };
