@@ -16,7 +16,7 @@ npm install expressions-js
 
 `parse(expr)` will return a function that can be executed against any context and will return the results.
 
-```
+```js
 var user = { name: 'Jacob' };
 var product = { name: 'Toothbrush' };
 
@@ -29,7 +29,7 @@ var productsName = getName.call(product); // Toothbrush
 
 `parseSetter(expr)` will return a function that sets the given value against the called context.
 
-```
+```js
 var setName = expressions.parseSetter('name');
 
 setName.call(user, 'Jac');
@@ -41,7 +41,7 @@ console.log(user.name); // Jac
 All of the following are valid expressions. The rule of thumb is if it can be put on one line as a `return` statement
 it is supported.
 
-```
+```js
 expressions.parse('user.name');
 
 expressions.parse('user.firstName + " " + user.lastName');
@@ -78,7 +78,7 @@ The full available arguments for `parse` and `parseSetter` are as follows:
 Globals are an object to define global variables which should not be prefixed with `this.` (bound to the context the
 expression is running in). For example, if you are using underscore.js you could use it within expressions by adding it
 to `globals`. For example:
-```
+```js
 var expr = expressions.parse('_.map(obj, mapper)', { "_": _ });
 ```
 
@@ -92,7 +92,7 @@ In addition, Expressions.js has some global defaults that you do not need to add
 
 These default `globals` will be merged with the `globals` object provided in `parse`. You can add to these default
 globals to provide functionality to all expressions. Example:
-```
+```js
 expressions.globals._ = require('underscore');
 ```
 
@@ -106,7 +106,7 @@ globals option is nicer than doing this. If you use `null` as the value of a glo
 Formatters allow an easy way to alter the results of the expression. Formatters are provided as an object hash of
 name-function pairs.
 
-```
+```js
 // Using formatters
 var formatters = {
   upper: function(value) {
@@ -135,7 +135,7 @@ formatter is used in a setter, an additional `setter` argument will be appended 
 When writing a formatter, remember to handle `null` cases. Below are a few examples of formatters and how they would be
 used in an expression.
 
-```
+```js
 var formatters = {
   lower: function(value) {
     return typeof value === 'string' ? value.toLowerCase() : value;
@@ -147,7 +147,7 @@ var expr = expressions.parse('user.name | lower');
 expr.parse(context, formatters);
 ```
 
-```
+```js
 formatters.filter = function(value, filterFunc) {
   return Array.isArray(value) ? value.filter(filterFunc) : value;
 };
@@ -159,7 +159,7 @@ expr.parse(context, formatters);
 In a setter a formatter's arguments will be appended by a boolean `true` value to indicate it is being used in a setter.
 While many formatters will work the same both ways, some may work differently when setting vs getting. Possible example:
 
-```
+```js
 formatters.isoDate = function(value, isSetter) {
   if (isSetter) {
     return new Date(value);
@@ -175,7 +175,7 @@ formatters.isoDate = function(value, isSetter) {
 Additional String arguments may be passed to `parse` in order to inject additional arguments into the expression. These
 Strings will become the argument names that will be added to the expression function. `parseSetters` uses this actually
 to pass the value of the setter in. Here is an example:
-```
+```js
 var context = {
   add: function(a, b) {
     return a + b;
@@ -197,20 +197,20 @@ be a bit complex to achieve this goal, but this blackboxed complexity simplifies
 
 We'll start with the most basic example and work up.
 
-```
+```js
 expressions.parse('name');
 ```
 creates
-```
+```js
 function() {
   return this.name;
 }
 ```
-```
+```js
 expressions.parseSetter('name');
 ```
 creates
-```
+```js
 function(_value_) {
   this.name = _value_;
 }
@@ -233,21 +233,21 @@ We can find inspiration from CoffesScript's (and Ruby's) syntax `user?.name` whe
 defined. In Expressions.js, every chained property has an implicit `?` there, so you never have to worry about null
 properties. But you will still get exceptions when your own code has errors in it.
 
-```
+```js
 expressions.parse('user.name');
 ```
 creates
-```
+```js
 function() {
   var _ref1;
   return (_ref1 = this.user) == null ? void 0 : _ref1.name;
 }
 ```
-```
+```js
 expressions.parseSetter('user.name');
 ```
 creates
-```
+```js
 function(value) {
   var _ref1;
   (_ref1 = this.user) == null ? void 0 : (_ref1.name = value);
@@ -262,12 +262,12 @@ thrown from the user's code helping them find bugs easily.
 Moving on to how globals and formatters work is much simpler. They are added to the arguments of the function and
 referenced within the function from their object.
 
-```
+```js
 var globals = { moment: require('moment') };
 expression.parse('moment(friend.birthday).format()', globals);
 ```
 creates
-```
+```js
 function(_globals_) {
   var _ref1, _ref2;
   return _globals_.moment == null ? void 0 : (_ref2 = _globals_.moment((_ref1 = this.friend) == null ? void 0: _ref1.birthday)) == null ? void 0 : _ref2.format();
@@ -277,11 +277,11 @@ function(_globals_) {
 While the function is really starting to get hard to read, the main thing to note is that `_globals_` is passed in and
 anything that is on that object is called from `_globals_` rather than `this`. Formatting is similar.
 
-```
+```js
 expression.parse('group.members | filter(isAdmin)');
 ```
 creates
-```
+```js
 function(_formatters_) {
   var _ref1;
   return _formatters_.filter.call(this, (_ref1 = this.user) == null ? void 0 : _ref1.name, this.isAdmin);
