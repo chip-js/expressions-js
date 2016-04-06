@@ -208,6 +208,19 @@ describe('Expressions.js', function() {
       it('should not fail when a function does not exist', function() {
         expect(callFoo.call({})).to.equal(undefined);
       });
+
+      it('should suppor extra arguments', function() {
+        var callFooBar = expressions.parse('foo(bar, bash)', null, null, 'bar', 'bash');
+        var passedArg1, passedArg2, bar = {}, bash = {};
+        callFooBar.call({
+          foo: function(arg1, arg2) {
+            passedArg1 = arg1;
+            passedArg2 = arg2;
+          }
+        }, bar, bash);
+        expect(passedArg1).to.equal(bar);
+        expect(passedArg2).to.equal(bash);
+      });
     });
 
 
