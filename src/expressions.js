@@ -8,8 +8,8 @@ var cache = {};
 exports.globals = {};
 
 
-exports.parse = function(expr, globals, formatters, extraArgs) {
-  if (!Array.isArray(extraArgs)) extraArgs = [];
+exports.parse = function(expr, globals, formatters) {
+  var extraArgs = slice.call(arguments, 3);
   var cacheKey = expr + '|' + extraArgs.join(',');
   // Returns the cached function for this expression if it exists.
   var func = cache[cacheKey];
@@ -37,10 +37,8 @@ exports.parse = function(expr, globals, formatters, extraArgs) {
 
 
 exports.parseSetter = function(expr, globals, formatters, extraArgs) {
-  if (!Array.isArray(extraArgs)) extraArgs = [];
+  var extraArgs = slice.call(arguments, 3);
 
-  // Add _value_ as the first extra argument
-  extraArgs.unshift(valueProperty);
   if (expr.charAt(0) === '!') {
     // Allow '!prop' to become 'prop = !value'
     expr = expr.slice(1).replace(/(\s*\||$)/, ' = !_value_$1');
@@ -48,7 +46,8 @@ exports.parseSetter = function(expr, globals, formatters, extraArgs) {
     expr = expr.replace(/(\s*\||$)/, ' = _value_$1');
   }
 
-  return exports.parse(expr, globals, formatters, extraArgs);
+  // Add _value_ as the first extra argument
+  return exports.parse.apply(exports, [expr, globals, formatters, valueProperty].concat(extraArgs));
 };
 
 
