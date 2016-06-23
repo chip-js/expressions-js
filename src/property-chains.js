@@ -240,12 +240,15 @@ function parseFunction(link, index, expr) {
   }
 
   var calledLink = link + '(~~insideParens~~)';
-  if (expr.charAt(propertyRegex.lastIndex) === '.') {
-    calledLink = parsePart(calledLink, index)
-  }
 
   link = 'typeof ' + link + ' !== \'function\' ? void 0 : ' + calledLink;
   var insideParens = call.slice(1, -1);
+
+  if (expr.charAt(propertyRegex.lastIndex) === '.') {
+    currentReference = ++referenceCount;
+    var ref = '_ref' + currentReference;
+    link = '(' + ref + ' = (' + link + ')) == null ? void 0 : ';
+  }
 
   var ref = currentReference;
   link = link.replace('~~insideParens~~', parsePropertyChains(insideParens));
