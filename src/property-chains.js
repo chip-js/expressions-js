@@ -163,7 +163,7 @@ function parseChain(prefix, propChain, postfix, paren, expr) {
   var links = splitLinks(propChain);
   var newChain = '';
 
-  if (links.length === 1 && !continuation && !paren) {
+  if (links.length === 1 && !continuation && !parens[paren]) {
     link = links[0];
     newChain = addThisOrGlobal(link);
   } else {

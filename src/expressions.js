@@ -9,6 +9,9 @@ exports.globals = {};
 
 
 exports.parse = function(expr, globals, formatters) {
+  if (typeof expr !== 'string') {
+    throw new TypeError('Invalid expr, must be type String');
+  }
   var extraArgs = slice.call(arguments, 3);
   var cacheKey = expr + '|' + extraArgs.join(',');
   // Returns the cached function for this expression if it exists.
