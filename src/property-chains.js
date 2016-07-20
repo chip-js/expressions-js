@@ -18,6 +18,8 @@ var defaultGlobals = {
   isNaN: null,
   Array: null,
   typeof: null,
+  encodeURI: null,
+  encodeURIComponent: null,
   _globals_: null,
   _formatters_: null,
   _value_: null,
