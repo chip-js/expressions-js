@@ -60,8 +60,11 @@ var chainLinksRegex = /\.|\[/g;
 // the property name part of links
 var chainLinkRegex = /\.|\[|\(/;
 
-var andRegex = / and /g;
-var orRegex = / or /g;
+var substitutions = {
+  ' && ': / and /g,
+  ' || ': / or /g,
+  ' === ': / is /g
+};
 
 
 exports.parseExpression = function(expr, _globals) {
@@ -73,7 +76,7 @@ exports.parseExpression = function(expr, _globals) {
   continuation = false;
   globals = _globals;
 
-  expr = replaceAndsAndOrs(expr);
+  expr = replaceSubstitutions(expr);
   if (expr.indexOf(' = ') !== -1) {
     var parts = expr.split(' = ');
     var setter = parts[0];
@@ -319,8 +322,11 @@ function parsePart(part, index) {
 }
 
 
-function replaceAndsAndOrs(expr) {
-  return expr.replace(andRegex, ' && ').replace(orRegex, ' || ');
+function replaceSubstitutions(expr) {
+  Object.keys(substitutions).forEach(function(replacement) {
+    expr = expr.replace(substitutions[replacement], replacement);
+  });
+  return expr;
 }
 
 
