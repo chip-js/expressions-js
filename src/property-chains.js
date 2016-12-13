@@ -28,6 +28,7 @@ var defaultGlobals = {
   _globals_: null,
   _formatters_: null,
   _value_: null,
+  new: null
 };
 
 
