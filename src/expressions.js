@@ -92,8 +92,10 @@ function compileExpression(original, expr, globals, formatters, extraArgs) {
 
 // a custom "bind" function to bind arguments to a function without binding the context
 function bindArguments(func) {
-  var args = slice.call(arguments, 1);
-  return function() {
+  function binder() {
     return func.apply(this, args.concat(slice.call(arguments)));
   }
+
+  var args = slice.call(arguments, 1);
+  return binder;
 }
