@@ -1,6 +1,6 @@
 {
   "name": "expressions-js",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Converts simplified JavaScript expressions into executable functions for JavaScript frameworks.",
   "keywords": [
     "templates",
